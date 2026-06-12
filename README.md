@@ -1,6 +1,17 @@
 # 🎬 CineBooking - Premium Movie Booking Application
 
+**🌍 Live Demo:** [https://6a2bba5e0d90e30f568d8862--cinebooking-frontend.netlify.app/](https://6a2bba5e0d90e30f568d8862--cinebooking-frontend.netlify.app/)
+
 Welcome to **CineBooking**, a fully functional, highly secure, and beautifully designed full-stack web application. It allows users to seamlessly browse movies, book theater seats dynamically, and manage their reservations, while providing Administrators with an incredibly powerful Analytics Engine and Management Dashboard.
+
+> [!WARNING]
+> **Live Deployment Note (Render Free Tier)**
+> This application is configured to run on Render's free tier. Because Render permanently blocks outbound SMTP ports (587) to prevent spam, the OTP Email functionality will fail for normal users unless you verify your Render account with a credit card. 
+> 
+> **How to test the app without OTP:**
+> You can bypass the OTP requirement by logging in directly as an Administrator. Admins are exempt from the 2FA flow!
+> - **Username**: `movieadmin`
+> - **Password**: `admin123`
 
 ---
 
@@ -65,16 +76,16 @@ CREATE DATABASE movie_db;
 ```
 
 ### 2. Backend Configuration
-Navigate to `src/main/resources/application.properties` and verify your credentials:
+Navigate to `src/main/resources/application.properties` and provide your credentials via environment variables or hardcode them for local testing:
 ```properties
 # Postgres Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/movie_db
-spring.datasource.username=postgres
-spring.datasource.password=1234
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/movie_db}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:postgres}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
 # Email SMTP (For OTPs)
-spring.mail.username=codezurohq@gmail.com
-spring.mail.password=your-app-password
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
 ```
 
 Run the Spring Boot Application via your IDE or terminal:
