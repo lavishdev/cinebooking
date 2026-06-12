@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: movie_db
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-1234}
+      POSTGRES_DB: movie_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - movie_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/movie_db
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-1234}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+      - JWT_SECRET=${JWT_SECRET:-ZHVtbXlTZWNyZXRLZXlGb3JKV1QxMjM0NTY3ODkw}
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - movie_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8080/api}
+        - VITE_IMAGE_BASE_URL=${VITE_IMAGE_BASE_URL:-http://localhost:8080}
+    container_name: movie_frontend
+    ports:
+      - "5173:80" # Mapping port 80 inside container to 5173 externally
+    depends_on:
+      - backend
+    networks:
+      - movie_network
+
+volumes:
+  postgres_data:
+  uploads_data:
+
+networks:
+  movie_network:
+    driver: bridge

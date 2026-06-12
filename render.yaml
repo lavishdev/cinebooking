@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: movie-booking-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon # or frankfurt
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false # Set manually in Render dashboard
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false # Set manually in Render dashboard
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false # Set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false # Set manually in Render dashboard
+      - key: MAIL_USERNAME
+        sync: false # Set manually in Render dashboard
+      - key: MAIL_PASSWORD
+        sync: false # Set manually in Render dashboard
+      - key: FRONTEND_URL
+        sync: false # Set manually in Render dashboard (e.g. https://your-site.netlify.app)
