@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       await authService.registerNormalUser(userData);
-      return { requiresOtp: false, username: userData.username };
+      return { requiresOtp: true, username: userData.username };
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;

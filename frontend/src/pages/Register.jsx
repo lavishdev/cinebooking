@@ -52,8 +52,7 @@ const Register = () => {
             
         setSuccess(`OTP has been sent to this mail ${maskedName}@${domain}`);
       } else {
-        setSuccess('Account created successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000);
+        navigate('/');
       }
     } catch (err) {
       const msg = err?.response?.data?.message || err?.response?.data || 'Registration failed. Please try again.';
