@@ -47,10 +47,9 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(registerRequestdto.getPassword()));
         user.setEmail(registerRequestdto.getEmail());
         user.setRoles(roles);
-        user.setIsEnabled(false); // Must verify OTP
+        user.setIsEnabled(true); // Free tier bypass
         user = userRepo.save(user);
 
-        otpService.generateAndSendOtp(user.getEmail());
         return user;
     }
 
@@ -76,29 +75,15 @@ public class AuthenticationService {
                     .build();
         }
 
-        // 🛡️ Admin Bypass: Admins do not require 2FA OTP to login
-        boolean isAdmin = user.getRoles().stream()
-                .anyMatch(role -> role == Role.ROLE_ADMIN);
-                
-        if (isAdmin) {
-            String token = jwtService.generateToken(user);
-            return LoginResponsedto.builder()
-                    .userId(user.getId())
-                    .jwtToken(token)
-                    .username(user.getUsername())
-                    .roles(user.getRoles())
-                    .message("Admin Login successful")
-                    .requiresOtp(false)
-                    .build();
-        }
-
-        // Send Login OTP for normal users
-        otpService.generateAndSendOtp(user.getEmail());
-        String maskedEmail = maskEmail(user.getEmail());
+        // 🛡️ Free Tier Bypass: Generate JWT directly for everyone
+        String token = jwtService.generateToken(user);
         return LoginResponsedto.builder()
-                .message("OTP has been sent to this mail " + maskedEmail)
-                .requiresOtp(true)
+                .userId(user.getId())
+                .jwtToken(token)
                 .username(user.getUsername())
+                .roles(user.getRoles())
+                .message("Login successful")
+                .requiresOtp(false)
                 .build();
     }
 
